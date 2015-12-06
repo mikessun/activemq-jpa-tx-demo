@@ -1,4 +1,4 @@
-package com.shengwang.demo;
+package com.msun.demo;
 
 import javax.jms.Queue;
 

@@ -1,4 +1,4 @@
-package com.shengwang.demo;
+package com.msun.demo;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
