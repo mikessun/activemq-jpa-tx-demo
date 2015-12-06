@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xsi:schemaLocation="http://www.springframework.org/schema/jms
+      http://www.springframework.org/schema/jms/spring-jms-4.1.xsd
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:component-scan base-package="com.msun.demo"/>
+    <context:component-scan base-package="com.msun.service"/>
+
+    <!-- enable the configuration of jms on annotations -->
+    <jms:annotation-driven/>
+
+    <!-- =============================================== -->
+    <!-- JMS Common, define JMS connectionFactory        -->
+    <!-- =============================================== -->
+    <!-- Activemq connection factory -->
+    <bean id="amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <!-- brokerURL -->
+        <constructor-arg index="0" value="tcp://mint17:61616"/>
+        <property name="redeliveryPolicy" ref="redeliveryPolicy"></property>
+    </bean>
+
+    <!-- Pooled Spring connection factory -->
+    <bean id="connectionFactory"
+          class="org.springframework.jms.connection.CachingConnectionFactory">
+        <constructor-arg ref="amqConnectionFactory"/>
+    </bean>
+
+    <!-- =============================================== -->
+    <!-- JMS receive, define JmsListenerContainerFactory -->
+    <!-- =============================================== -->
+    <bean id="jmsListenerContainerFactory"
+          class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="concurrency" value="3-10"/>
+        <property name="sessionTransacted" value="true"/>
+        <!--
+        <property name="transactionManager" ref="local.transactionManager" />
+        -->
+    </bean>
+
+
+    <!-- Wait 1 seconds first re-delivery, then 2, 4,6, 8, 16,32 seconds -->
+    <bean id="redeliveryPolicy" class="org.apache.activemq.RedeliveryPolicy">
+        <property name="backOffMultiplier" value="2"/>
+        <property name="initialRedeliveryDelay" value="1000"/>
+        <property name="maximumRedeliveries" value="6"/>
+        <property name="queue" value="#myDLQ"/>
+        <property name="redeliveryDelay" value="1000"/>
+        <property name="useExponentialBackOff" value="true"/>
+    </bean>
+
+    <!--
+    <amq:queue id="myDLQ" physicalName="DLQ.myDLQ" />
+    -->
+
+    <bean id="local.transactionManager"
+          class="org.springframework.jms.connection.JmsTransactionManager">
+        <!-- can also refer to amq.connectionFactory -->
+        <property name="connectionFactory" ref="connectionFactory" />
+    </bean>
+
+</beans>
