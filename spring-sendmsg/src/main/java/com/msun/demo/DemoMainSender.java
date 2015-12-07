@@ -20,7 +20,7 @@ public class DemoMainSender {
 
         // send to default destination
         for (int i = 0; i <1 ; i++) {
-            jmsMessageSender.send("hello JMS at " + new Date());
+            jmsMessageSender.send("hello JMS11 at " + new Date());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

@@ -1,12 +1,14 @@
-package com.byteslounge.spring.tx.dao;
+package com.msun.spring.tx.dao;
 
 import java.util.List;
 
-import com.byteslounge.spring.tx.model.User;
+import com.msun.spring.tx.model.User;
 
 public interface UserDAO {
 
 	void insertUser(User user);
 
 	List<User> findAllUsers();
+
+	User findUserByUserName(String userName);
 }

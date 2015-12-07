@@ -1,6 +1,7 @@
 package com.msun.service;
 
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,7 +11,7 @@ public class JmsMessageListener {
 
     @JmsListener(destination = MSG_SENDER)
     //@SendTo("RecvToSend")
-    public String processMessage(String text) {
+    public void processMessage(String text) {
 
         long threadId = Thread.currentThread().getId();
         System.out.println("current thread #" + threadId + " Received: " + text);
@@ -23,6 +24,6 @@ public class JmsMessageListener {
             System.out.println("retrial==" + count++);
             throw new RuntimeException("redelivery for " + text);
         }
-        return "ACK from handleMessage " + text;
+        //return "ACK from handleMessage " + text;
     }
 }
